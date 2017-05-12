@@ -227,22 +227,7 @@ def get_certain_dayofweek(Speed,dayofweek = 0):
 
 # In[5]:
 
-train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
-test_speed = train_speed[-1:]
-train_speed = train_speed[:-1]
 
-print('train_speed.shape = ',train_speed.shape)
-print('test_speed.shape = ',test_speed.shape)
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
-test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
 
 
 # In[7]:
@@ -310,6 +295,25 @@ def create_dataset_historyAsFeature(Speed, Speed_y, look_back=15, mode='uni'):
             dataY.append(numpy.array(dataY_))
             
     return numpy.array(dataX), numpy.array(dataY)
+
+
+train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
+test_speed = train_speed[-1:]
+train_speed = train_speed[:-1]
+
+print('train_speed.shape = ',train_speed.shape)
+print('test_speed.shape = ',test_speed.shape)
+look_back = 15
+mode = 'uni'
+train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
+test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
+print('look_back = ',look_back)
+print('mode = ',mode)
+print('train_speed_x.shape = ',train_speed_x.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x.shape = ',test_speed_x.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
+
 
 def create_dataset_historyAsSecondInput(Speed, Speed_y, look_back=15,look_back_days=6, mode='uni'):
     
