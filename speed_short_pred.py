@@ -503,221 +503,221 @@ def history_plot_historyAsSecondInput(history_object,image1,image2,a=np.zeros((t
 epochs = 1000
 
 
-# ### Experiment1: input: univariate speed; output: univariate speed; lookback = 15; same day of week
-
-# In[ ]:
-
-train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
-test_speed = train_speed[-1:]
-train_speed = train_speed[:-1]
-
-print('train_speed.shape = ',train_speed.shape)
-print('test_speed.shape = ',test_speed.shape)
-
-
-# In[ ]:
-
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
-test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
-# In[ ]:
-
-# plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
-
-
-# In[ ]:
-
-batch_size = train_speed_x.shape[1]
-
-model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# model.add(Dropout(0.3))
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# model.add(Dropout(0.3))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-
-
-# In[ ]:
-
-history_plot(history,'images/history_exp1.png','images/test_exp1.png')
-
-
-# ### Experiment1.1: input: univariate speed; output: univariate speed; lookback = 15; all year
-
-# In[ ]:
-
-test_speed = Speed[333:334,:,:]
-train_speed = Speed[:333,:,:]
-print('train_speed.shape = ',train_speed.shape)
-print('test_speed.shape = ',test_speed.shape)
-
-
-# In[ ]:
-
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
-test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
-# In[ ]:
-
-batch_size = train_speed_x.shape[1]
-
-model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# model.add(Dropout(0.3))
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# model.add(Dropout(0.3))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# history_plot(history)
-
-
-# In[ ]:
-
-history_plot(history,'images/history_exp11.png','images/test_exp11.png')
-
-
-# ### Experiment2: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); consecutive previous days
-
-# In[ ]:
-
-
-train_speed = Speed[:334,:,:]
-
-print('train_speed.shape = ',train_speed.shape)
-
-
-# In[ ]:
-
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset_historyAsFeature(train_speed,train_speed, look_back, mode)
-# test_speed_x,test_speed_y = create_dataset_historyAsFeature(test_speed, look_back, mode)
-test_speed_x = train_speed_x[-1:,:,:,:]
-test_speed_y = train_speed_y[-1:,:,:]
-train_speed_x = train_speed_x[:-1,:,:,:]
-train_speed_y = train_speed_y[:-1,:,:]
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
-# In[ ]:
-
-# plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
-
-
-# In[ ]:
-
-batch_size = train_speed_x.shape[1]
-
-model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# model.add(Dropout(0.3))
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# model.add(Dropout(0.3))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# history_plot_historyAsFeature(history)
-
-
-# In[ ]:
-
-history_plot_historyAsFeature(history,'images/history_exp2.png','images/test_exp2.png')
-
-
-# ### Experiment2.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); previous same day of week
-
-# In[ ]:
-
-# test_speed = Speed[333:334,:,:]
-train_speed = Speed[:334,:,:]
-dayofweek = data['dayofweek'][333]
-train_speed = Speed[data.index[data['dayofweek'] == dayofweek],:,:]
-train_speed = train_speed[0:48,:,:]
-print('train_speed.shape = ',train_speed.shape)
-# print('test_speed.shape = ',test_speed.shape)
-
-
-# In[ ]:
-
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset_historyAsFeature(train_speed,train_speed, look_back, mode)
-# test_speed_x,test_speed_y = create_dataset_historyAsFeature(test_speed, look_back, mode)
-test_speed_x = train_speed_x[-1:,:,:,:]
-test_speed_y = train_speed_y[-1:,:,:]
-train_speed_x = train_speed_x[:-1,:,:,:]
-train_speed_y = train_speed_y[:-1,:,:]
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
-# In[ ]:
-
-# plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
-
-
-# In[ ]:
-
-batch_size = train_speed_x.shape[1]
-
-model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# model.add(Dropout(0.3))
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# model.add(Dropout(0.3))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# history_plot_historyAsFeature(history)
-
-
-# In[ ]:
-
-history_plot_historyAsFeature(history,'images/history_exp21.png','images/test_exp21.png')
-
-
+## ### Experiment1: input: univariate speed; output: univariate speed; lookback = 15; same day of week
+#
+## In[ ]:
+#
+#train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
+#test_speed = train_speed[-1:]
+#train_speed = train_speed[:-1]
+#
+#print('train_speed.shape = ',train_speed.shape)
+#print('test_speed.shape = ',test_speed.shape)
+#
+#
+## In[ ]:
+#
+#look_back = 15
+#mode = 'uni'
+#train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
+#test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
+#print('look_back = ',look_back)
+#print('mode = ',mode)
+#print('train_speed_x.shape = ',train_speed_x.shape)
+#print('train_speed_y.shape = ',train_speed_y.shape)
+#print('test_speed_x.shape = ',test_speed_x.shape)
+#print('test_speed_y.shape = ',test_speed_y.shape)
+#
+#
+## In[ ]:
+#
+## plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
+#
+#
+## In[ ]:
+#
+#batch_size = train_speed_x.shape[1]
+#
+#model = Sequential()
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+## model.add(Dropout(0.3))
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+## model.add(Dropout(0.3))
+#model.add(Dense(1))
+#model.compile(loss='mean_squared_error', optimizer='adam')
+#
+#train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+#train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+#history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+#
+#
+## In[ ]:
+#
+#history_plot(history,'images/history_exp1.png','images/test_exp1.png')
+#
+#
+## ### Experiment1.1: input: univariate speed; output: univariate speed; lookback = 15; all year
+#
+## In[ ]:
+#
+#test_speed = Speed[333:334,:,:]
+#train_speed = Speed[:333,:,:]
+#print('train_speed.shape = ',train_speed.shape)
+#print('test_speed.shape = ',test_speed.shape)
+#
+#
+## In[ ]:
+#
+#look_back = 15
+#mode = 'uni'
+#train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
+#test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
+#print('look_back = ',look_back)
+#print('mode = ',mode)
+#print('train_speed_x.shape = ',train_speed_x.shape)
+#print('train_speed_y.shape = ',train_speed_y.shape)
+#print('test_speed_x.shape = ',test_speed_x.shape)
+#print('test_speed_y.shape = ',test_speed_y.shape)
+#
+#
+## In[ ]:
+#
+#batch_size = train_speed_x.shape[1]
+#
+#model = Sequential()
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+## model.add(Dropout(0.3))
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+## model.add(Dropout(0.3))
+#model.add(Dense(1))
+#model.compile(loss='mean_squared_error', optimizer='adam')
+#
+#train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+#train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+#history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+## history_plot(history)
+#
+#
+## In[ ]:
+#
+#history_plot(history,'images/history_exp11.png','images/test_exp11.png')
+#
+#
+## ### Experiment2: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); consecutive previous days
+#
+## In[ ]:
+#
+#
+#train_speed = Speed[:334,:,:]
+#
+#print('train_speed.shape = ',train_speed.shape)
+#
+#
+## In[ ]:
+#
+#look_back = 15
+#mode = 'uni'
+#train_speed_x,train_speed_y = create_dataset_historyAsFeature(train_speed,train_speed, look_back, mode)
+## test_speed_x,test_speed_y = create_dataset_historyAsFeature(test_speed, look_back, mode)
+#test_speed_x = train_speed_x[-1:,:,:,:]
+#test_speed_y = train_speed_y[-1:,:,:]
+#train_speed_x = train_speed_x[:-1,:,:,:]
+#train_speed_y = train_speed_y[:-1,:,:]
+#print('look_back = ',look_back)
+#print('mode = ',mode)
+#print('train_speed_x.shape = ',train_speed_x.shape)
+#print('train_speed_y.shape = ',train_speed_y.shape)
+#print('test_speed_x.shape = ',test_speed_x.shape)
+#print('test_speed_y.shape = ',test_speed_y.shape)
+#
+#
+## In[ ]:
+#
+## plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
+#
+#
+## In[ ]:
+#
+#batch_size = train_speed_x.shape[1]
+#
+#model = Sequential()
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+## model.add(Dropout(0.3))
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+## model.add(Dropout(0.3))
+#model.add(Dense(1))
+#model.compile(loss='mean_squared_error', optimizer='adam')
+#
+#train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+#train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+#history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+## history_plot_historyAsFeature(history)
+#
+#
+## In[ ]:
+#
+#history_plot_historyAsFeature(history,'images/history_exp2.png','images/test_exp2.png')
+#
+#
+## ### Experiment2.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); previous same day of week
+#
+## In[ ]:
+#
+## test_speed = Speed[333:334,:,:]
+#train_speed = Speed[:334,:,:]
+#dayofweek = data['dayofweek'][333]
+#train_speed = Speed[data.index[data['dayofweek'] == dayofweek],:,:]
+#train_speed = train_speed[0:48,:,:]
+#print('train_speed.shape = ',train_speed.shape)
+## print('test_speed.shape = ',test_speed.shape)
+#
+#
+## In[ ]:
+#
+#look_back = 15
+#mode = 'uni'
+#train_speed_x,train_speed_y = create_dataset_historyAsFeature(train_speed,train_speed, look_back, mode)
+## test_speed_x,test_speed_y = create_dataset_historyAsFeature(test_speed, look_back, mode)
+#test_speed_x = train_speed_x[-1:,:,:,:]
+#test_speed_y = train_speed_y[-1:,:,:]
+#train_speed_x = train_speed_x[:-1,:,:,:]
+#train_speed_y = train_speed_y[:-1,:,:]
+#print('look_back = ',look_back)
+#print('mode = ',mode)
+#print('train_speed_x.shape = ',train_speed_x.shape)
+#print('train_speed_y.shape = ',train_speed_y.shape)
+#print('test_speed_x.shape = ',test_speed_x.shape)
+#print('test_speed_y.shape = ',test_speed_y.shape)
+#
+#
+## In[ ]:
+#
+## plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
+#
+#
+## In[ ]:
+#
+#batch_size = train_speed_x.shape[1]
+#
+#model = Sequential()
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+## model.add(Dropout(0.3))
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+## model.add(Dropout(0.3))
+#model.add(Dense(1))
+#model.compile(loss='mean_squared_error', optimizer='adam')
+#
+#train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+#train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+#history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+## history_plot_historyAsFeature(history)
+#
+#
+## In[ ]:
+#
+#history_plot_historyAsFeature(history,'images/history_exp21.png','images/test_exp21.png')
+#
+#
 # ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); Monday only for training, Monday for testing
 # 
 
@@ -802,7 +802,7 @@ history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test
 
 
 # ### Experiment3.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
-# 
+#
 
 # In[ ]:
 
@@ -916,78 +916,78 @@ history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
 history_plot_historyAsSecondInput(history,'images/history_exp31.png','images/test_exp31.png')
 
 
-# ### Experiment4: input: univariate speed; output: univariate delta speed; lookback = 15
-
-# In[ ]:
-
-# Mon, Mon_delta, Mon_Z, mon_mean, mon_std = get_certain_dayofweek(Speed,dayofweek = 0)
-train_speed, train_speed_y, _, mean0, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
-test_speed = train_speed[-1:]
-train_speed = train_speed[:-1]
-test_speed_y = train_speed_y[-1:]
-train_speed_y = train_speed_y[:-1]
-
-
-print('train_speed.shape = ',train_speed.shape)
-print('test_speed.shape = ',test_speed.shape)
-
-
-# In[ ]:
-
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset(train_speed,train_speed_y, look_back, mode)
-test_speed_x,test_speed_y = create_dataset(test_speed,test_speed_y, look_back, mode)
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
-# In[ ]:
-
-# plt.plot(test_speed_y[0,390:510,:]+mean0[390:510,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
-
-
-# In[ ]:
-
-batch_size = train_speed_x.shape[1]
-
-model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# model.add(Dropout(0.3))
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# model.add(Dropout(0.3))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-
-train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# history_plot(history,mean0)
-
-
-# In[ ]:
-
-history_plot(history,'images/history_exp4.png','images/test_exp4.png',mean0)
-
-
-# ### Experiment5: input: univariate speed; output: univariate delta speed; lookback = 15; lookback weeks = 15 (as feature);
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
+## ### Experiment4: input: univariate speed; output: univariate delta speed; lookback = 15
+#
+## In[ ]:
+#
+## Mon, Mon_delta, Mon_Z, mon_mean, mon_std = get_certain_dayofweek(Speed,dayofweek = 0)
+#train_speed, train_speed_y, _, mean0, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
+#test_speed = train_speed[-1:]
+#train_speed = train_speed[:-1]
+#test_speed_y = train_speed_y[-1:]
+#train_speed_y = train_speed_y[:-1]
+#
+#
+#print('train_speed.shape = ',train_speed.shape)
+#print('test_speed.shape = ',test_speed.shape)
+#
+#
+## In[ ]:
+#
+#look_back = 15
+#mode = 'uni'
+#train_speed_x,train_speed_y = create_dataset(train_speed,train_speed_y, look_back, mode)
+#test_speed_x,test_speed_y = create_dataset(test_speed,test_speed_y, look_back, mode)
+#print('look_back = ',look_back)
+#print('mode = ',mode)
+#print('train_speed_x.shape = ',train_speed_x.shape)
+#print('train_speed_y.shape = ',train_speed_y.shape)
+#print('test_speed_x.shape = ',test_speed_x.shape)
+#print('test_speed_y.shape = ',test_speed_y.shape)
+#
+#
+## In[ ]:
+#
+## plt.plot(test_speed_y[0,390:510,:]+mean0[390:510,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
+#
+#
+## In[ ]:
+#
+#batch_size = train_speed_x.shape[1]
+#
+#model = Sequential()
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+## model.add(Dropout(0.3))
+#model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+## model.add(Dropout(0.3))
+#model.add(Dense(1))
+#model.compile(loss='mean_squared_error', optimizer='adam')
+#
+#train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+#train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+#history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+## history_plot(history,mean0)
+#
+#
+## In[ ]:
+#
+#history_plot(history,'images/history_exp4.png','images/test_exp4.png',mean0)
+#
+#
+## ### Experiment5: input: univariate speed; output: univariate delta speed; lookback = 15; lookback weeks = 15 (as feature);
+#
+## In[ ]:
+#
+#
+#
+#
+## In[ ]:
+#
+#
+#
+#
+## In[ ]:
+#
 
 
 
