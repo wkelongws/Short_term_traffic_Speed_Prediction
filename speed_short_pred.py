@@ -1,15 +1,15 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 import numpy
 import matplotlib.pyplot as plt
 from pandas import read_csv
 import math
-# import keras
+import keras
 from keras.models import Sequential, Model, model_from_json
-from keras.layers import merge, Dense, LSTM, Input, Reshape, Convolution2D, Deconvolution2D, Flatten, Dropout, MaxPooling2D, Activation
+from keras.layers import concatenate, merge, Dense, LSTM, Input, Reshape, Convolution2D, Deconvolution2D, Flatten, Dropout, MaxPooling2D, Activation
 from keras.activations import relu, softmax, linear
 from keras.layers.advanced_activations import PReLU, ELU
 from keras.optimizers import Adam
@@ -114,7 +114,7 @@ my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
 # pickle.dump( (Traffic,Speed,data), open( "speed_short_term.p", "wb" ) )
 
 
-# In[2]:
+# In[ ]:
 
 import pickle
 (Traffic,Speed,data) = pickle.load( open( "speed_short_term.p", "rb" ) )
@@ -123,7 +123,7 @@ print(Speed.shape)
 data.tail(5)
 
 
-# In[3]:
+# In[ ]:
 
 def get_certain_dayofweek(Speed,dayofweek = 0):
     data_sub = data[:len(Speed)]
@@ -225,12 +225,7 @@ def get_certain_dayofweek(Speed,dayofweek = 0):
 # fig.savefig('images/AvgSpeed_by_dayofweek.png')
 
 
-# In[5]:
-
-
-
-
-# In[7]:
+# In[ ]:
 
 def shapeback(Y):
     YY = np.reshape(Y[len(Y)%288:,:],(len(Y)//288,288,Y.shape[1]))
@@ -296,25 +291,6 @@ def create_dataset_historyAsFeature(Speed, Speed_y, look_back=15, mode='uni'):
             
     return numpy.array(dataX), numpy.array(dataY)
 
-
-train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
-test_speed = train_speed[-1:]
-train_speed = train_speed[:-1]
-
-print('train_speed.shape = ',train_speed.shape)
-print('test_speed.shape = ',test_speed.shape)
-look_back = 15
-mode = 'uni'
-train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
-test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
-print('look_back = ',look_back)
-print('mode = ',mode)
-print('train_speed_x.shape = ',train_speed_x.shape)
-print('train_speed_y.shape = ',train_speed_y.shape)
-print('test_speed_x.shape = ',test_speed_x.shape)
-print('test_speed_y.shape = ',test_speed_y.shape)
-
-
 def create_dataset_historyAsSecondInput(Speed, Speed_y, look_back=15,look_back_days=6, mode='uni'):
     
     dataX1,dataX2,dataY = [],[],[]
@@ -339,6 +315,24 @@ def create_dataset_historyAsSecondInput(Speed, Speed_y, look_back=15,look_back_d
             dataY.append(numpy.array(dataY_))
             
     return numpy.array(dataX1), numpy.array(dataX2), numpy.array(dataY)
+
+
+train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
+test_speed = train_speed[-1:]
+train_speed = train_speed[:-1]
+
+print('train_speed.shape = ',train_speed.shape)
+print('test_speed.shape = ',test_speed.shape)
+look_back = 15
+mode = 'uni'
+train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
+test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
+print('look_back = ',look_back)
+print('mode = ',mode)
+print('train_speed_x.shape = ',train_speed_x.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x.shape = ',test_speed_x.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
 
 
 def history_plot(history_object,image1,image2,a=np.zeros((test_speed_y.shape[1],1))):
@@ -504,14 +498,14 @@ def history_plot_historyAsSecondInput(history_object,image1,image2,a=np.zeros((t
     fig1.savefig(image2, bbox_inches='tight')
 
 
-# In[15]:
+# In[ ]:
 
-epochs = 1
+epochs = 1000
 
 
 # ### Experiment1: input: univariate speed; output: univariate speed; lookback = 15; same day of week
 
-# In[8]:
+# In[ ]:
 
 train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
 test_speed = train_speed[-1:]
@@ -521,7 +515,7 @@ print('train_speed.shape = ',train_speed.shape)
 print('test_speed.shape = ',test_speed.shape)
 
 
-# In[9]:
+# In[ ]:
 
 look_back = 15
 mode = 'uni'
@@ -540,7 +534,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[11]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -554,19 +548,17 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 
 
-# In[12]:
+# In[ ]:
 
 history_plot(history,'images/history_exp1.png','images/test_exp1.png')
 
 
 # ### Experiment1.1: input: univariate speed; output: univariate speed; lookback = 15; all year
 
-# In[13]:
-
-
+# In[ ]:
 
 test_speed = Speed[333:334,:,:]
 train_speed = Speed[:333,:,:]
@@ -574,7 +566,7 @@ print('train_speed.shape = ',train_speed.shape)
 print('test_speed.shape = ',test_speed.shape)
 
 
-# In[14]:
+# In[ ]:
 
 look_back = 15
 mode = 'uni'
@@ -588,7 +580,7 @@ print('test_speed_x.shape = ',test_speed_x.shape)
 print('test_speed_y.shape = ',test_speed_y.shape)
 
 
-# In[17]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -602,18 +594,18 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 # history_plot(history)
 
 
-# In[18]:
+# In[ ]:
 
 history_plot(history,'images/history_exp11.png','images/test_exp11.png')
 
 
 # ### Experiment2: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); consecutive previous days
 
-# In[19]:
+# In[ ]:
 
 
 train_speed = Speed[:334,:,:]
@@ -621,7 +613,7 @@ train_speed = Speed[:334,:,:]
 print('train_speed.shape = ',train_speed.shape)
 
 
-# In[20]:
+# In[ ]:
 
 look_back = 15
 mode = 'uni'
@@ -644,7 +636,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[22]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -658,18 +650,18 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 # history_plot_historyAsFeature(history)
 
 
-# In[23]:
+# In[ ]:
 
 history_plot_historyAsFeature(history,'images/history_exp2.png','images/test_exp2.png')
 
 
 # ### Experiment2.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); previous same day of week
 
-# In[24]:
+# In[ ]:
 
 # test_speed = Speed[333:334,:,:]
 train_speed = Speed[:334,:,:]
@@ -680,7 +672,7 @@ print('train_speed.shape = ',train_speed.shape)
 # print('test_speed.shape = ',test_speed.shape)
 
 
-# In[25]:
+# In[ ]:
 
 look_back = 15
 mode = 'uni'
@@ -703,7 +695,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[26]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -717,11 +709,11 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 # history_plot_historyAsFeature(history)
 
 
-# In[27]:
+# In[ ]:
 
 history_plot_historyAsFeature(history,'images/history_exp21.png','images/test_exp21.png')
 
@@ -729,7 +721,7 @@ history_plot_historyAsFeature(history,'images/history_exp21.png','images/test_ex
 # ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); Monday only for training, Monday for testing
 # 
 
-# In[28]:
+# In[ ]:
 
 train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
 # test_speed = train_speed[-1:]
@@ -739,7 +731,7 @@ print('train_speed.shape = ',train_speed.shape)
 # print('test_speed.shape = ',test_speed.shape)
 
 
-# In[29]:
+# In[ ]:
 
 look_back = 15
 look_back_days = 6
@@ -769,7 +761,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[30]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -782,10 +774,10 @@ historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='hi
 h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
 h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
 
-h3 = merge([h1, h2])
+h3 = keras.layers.concatenate([h1, h2])
 predictedSpeed = Dense(1,name='predictedSpeed')(h3)
 
-model = Model(input=[todaySequence, historySequence], output=[predictedSpeed])
+model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
 
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -799,12 +791,12 @@ train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1
 
 history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
           {'predictedSpeed': train_y},
-          nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+          epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 
 # history_plot_historyAsSecondInput(history)
 
 
-# In[31]:
+# In[ ]:
 
 history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test_exp3.png')
 
@@ -812,7 +804,7 @@ history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test
 # ### Experiment3.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
 # 
 
-# In[32]:
+# In[ ]:
 
 # test_speed = Speed[333:334,:,:]
 # train_speed = Speed[:334,:,:]
@@ -829,7 +821,7 @@ print('train_speed0.shape = ',train_speed.shape)
 # print('test_speed.shape = ',test_speed.shape)
 
 
-# In[33]:
+# In[ ]:
 
 look_back = 15
 look_back_days = 6
@@ -885,7 +877,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[34]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -897,10 +889,10 @@ historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='hi
 h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
 h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
 
-h3 = merge([h1, h2])
+h3 = keras.layers.concatenate([h1, h2])
 predictedSpeed = Dense(1,name='predictedSpeed')(h3)
 
-model = Model(input=[todaySequence, historySequence], output=[predictedSpeed])
+model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
 
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -914,19 +906,19 @@ train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1
 
 history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
           {'predictedSpeed': train_y},
-          nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+          epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 
 # history_plot_historyAsSecondInput(history)
 
 
-# In[35]:
+# In[ ]:
 
 history_plot_historyAsSecondInput(history,'images/history_exp31.png','images/test_exp31.png')
 
 
 # ### Experiment4: input: univariate speed; output: univariate delta speed; lookback = 15
 
-# In[38]:
+# In[ ]:
 
 # Mon, Mon_delta, Mon_Z, mon_mean, mon_std = get_certain_dayofweek(Speed,dayofweek = 0)
 train_speed, train_speed_y, _, mean0, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
@@ -940,7 +932,7 @@ print('train_speed.shape = ',train_speed.shape)
 print('test_speed.shape = ',test_speed.shape)
 
 
-# In[39]:
+# In[ ]:
 
 look_back = 15
 mode = 'uni'
@@ -959,7 +951,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:]+mean0[390:510,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[40]:
+# In[ ]:
 
 batch_size = train_speed_x.shape[1]
 
@@ -973,11 +965,11 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-history = model.fit(train_x, train_y, nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 # history_plot(history,mean0)
 
 
-# In[41]:
+# In[ ]:
 
 history_plot(history,'images/history_exp4.png','images/test_exp4.png',mean0)
 
@@ -1001,7 +993,7 @@ history_plot(history,'images/history_exp4.png','images/test_exp4.png',mean0)
 
 # ### Experiment6: input: univariate speed; output: univariate delta speed; lookback = 15; lookback weeks = 6 (parallel structure)
 
-# In[42]:
+# In[ ]:
 
 # test_speed = Speed[333:334,:,:]
 # train_speed = Speed[:334,:,:]
@@ -1018,7 +1010,7 @@ print('train_speed0.shape = ',train_speed.shape)
 # print('test_speed.shape = ',test_speed.shape)
 
 
-# In[43]:
+# In[ ]:
 
 look_back = 15
 look_back_days = 6
@@ -1074,23 +1066,26 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 # plt.plot(test_speed_y[0,390:510,:]+mean0[390:510,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
-# In[44]:
+# In[ ]:
+
 
 batch_size = train_speed_x.shape[1]
 
-
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
 h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(h1)
+
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
 h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
 
-h3 = merge([h1, h2])
+h3 = keras.layers.concatenate([h1, h2],name='h3')
+# h3 = keras.layers.concatenate([h1, h2],name='h3')
+
 predictedSpeed = Dense(1,name='predictedSpeed')(h3)
 
-model = Model(input=[todaySequence, historySequence], output=[predictedSpeed])
+model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
 
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -1104,12 +1099,25 @@ train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1
 
 history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
           {'predictedSpeed': train_y},
-          nb_epoch=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+          epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 
 # history_plot_historyAsSecondInput(history,mean0)
 
 
-# In[45]:
+# In[ ]:
+
+# intermediate_layer_model_h1 = Model(inputs=model.input,
+#                                  outputs=model.get_layer('h1').output)
+# intermediate_output_h1 = intermediate_layer_model_h1.predict([train_x1[:1],train_x2[:1]])
+# intermediate_layer_model_h2 = Model(inputs=model.input,
+#                                  outputs=model.get_layer('h2').output)
+# intermediate_output_h2 = intermediate_layer_model_h2.predict([train_x1[:1],train_x2[:1]])
+# intermediate_layer_model_h3 = Model(inputs=model.input,
+#                                  outputs=model.get_layer('h3').output)
+# intermediate_output_h3 = intermediate_layer_model_h3.predict([train_x1[:1],train_x2[:1]])
+
+
+# In[ ]:
 
 history_plot_historyAsSecondInput(history,'images/history_exp6.png','images/test_exp6.png',mean0)
 
