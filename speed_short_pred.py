@@ -1031,7 +1031,6 @@ train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
 train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
 
 print('look_back = ',look_back)
-print('look_back_days = ',look_back_days)
 print('mode = ',mode)
 print('train_speed_x.shape = ',train_speed_x.shape)
 print('train_speed_y.shape = ',train_speed_y.shape)
