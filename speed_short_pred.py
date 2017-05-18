@@ -544,7 +544,7 @@ def history_plot_historyAsSecondInput(history_object,image1,image2,a=np.zeros((t
 
 # In[26]:
 
-epochs = 1000
+epochs = 200
 
 
 # ### Experiment1: input: univariate speed; output: univariate speed; lookback = 15; same day of week
@@ -1048,7 +1048,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 # model.add(Dropout(0.3))
@@ -1165,13 +1165,12 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-
+# h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
 h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
+# h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(historySequence)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
@@ -1394,7 +1393,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 # model.add(Dropout(0.3))
@@ -1511,12 +1510,12 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(h1)
+#h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(todaySequence)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
+#h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(historySequence)
 
 h3 = keras.layers.concatenate([h1, h2])
 predictedSpeed = Dense(train_speed_y.shape[2],name='predictedSpeed')(h3)
@@ -1636,7 +1635,7 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 # model.add(Dropout(0.3))
@@ -1755,13 +1754,13 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+#h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
 
 h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
+#h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(historySequence)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
