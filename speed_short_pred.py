@@ -1052,7 +1052,7 @@ model = Sequential()
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-# model.add(Dropout(0.3))
+model.add(Dropout(0.3))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -1177,7 +1177,7 @@ h2=BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
-
+h3 = Dropout(0.3)(h3)
 predictedSpeed = Dense(1,name='predictedSpeed')(h3)
 
 model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
@@ -1400,7 +1400,7 @@ model = Sequential()
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-# model.add(Dropout(0.3))
+model.add(Dropout(0.3))
 # model.add(Flatten())
 model.add(Dense(train_speed_y.shape[2]))
 model.compile(loss='mean_squared_error', optimizer='adam')
@@ -1524,6 +1524,7 @@ h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(hi
 h2 = BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2])
+h3 = Dropout(0.3)(h3)
 predictedSpeed = Dense(train_speed_y.shape[2],name='predictedSpeed')(h3)
 
 model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
@@ -1645,7 +1646,7 @@ model = Sequential()
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-# model.add(Dropout(0.3))
+model.add(Dropout(0.3))
 model.add(Dense(train_speed_y.shape[2]))
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -1772,6 +1773,7 @@ h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,nam
 h2 = BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
+h3 = Dropout(0.3)(h3)
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
 
 predictedSpeed = Dense(train_speed_y.shape[2],name='predictedSpeed')(h3)
