@@ -600,51 +600,53 @@ epochs = 200
 # history_plot(history,'images/history_exp1.png','images/test_exp1.png')
 
 
-# ### Experiment1.1: input: univariate speed; output: univariate speed; lookback = 15; all year
+ ### Experiment1.1: input: univariate speed; output: univariate speed; lookback = 15; all year
 
 # In[221]:
 
-# test_speed = Speed[333:334,:,:]
-# train_speed = Speed[:333,:,:]
-# print('train_speed.shape = ',train_speed.shape)
-# print('test_speed.shape = ',test_speed.shape)
+test_speed = Speed[333:334,:,:]
+train_speed = Speed[:333,:,:]
+print('train_speed.shape = ',train_speed.shape)
+print('test_speed.shape = ',test_speed.shape)
 
 
 # In[222]:
 
-# look_back = 15
-# mode = 'uni'
-# train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
-# test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
-# print('look_back = ',look_back)
-# print('mode = ',mode)
-# print('train_speed_x.shape = ',train_speed_x.shape)
-# print('train_speed_y.shape = ',train_speed_y.shape)
-# print('test_speed_x.shape = ',test_speed_x.shape)
-# print('test_speed_y.shape = ',test_speed_y.shape)
+look_back = 15
+mode = 'uni'
+train_speed_x,train_speed_y = create_dataset(train_speed,train_speed, look_back, mode)
+test_speed_x,test_speed_y = create_dataset(test_speed,test_speed, look_back, mode)
+print('look_back = ',look_back)
+print('mode = ',mode)
+print('train_speed_x.shape = ',train_speed_x.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x.shape = ',test_speed_x.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
 
 
 # In[ ]:
 
-# batch_size = train_speed_x.shape[1]
+batch_size = train_speed_x.shape[1]
 
-# model = Sequential()
-# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
-# # model.add(Dropout(0.3))
-# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
-# # model.add(Dropout(0.3))
-# model.add(Dense(1))
-# model.compile(loss='mean_squared_error', optimizer='adam')
+model = Sequential()
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+# model.add(Dropout(0.3))
+model.add(BatchNormalization())
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+model.add(Dense(1))
+model.compile(loss='mean_squared_error', optimizer='adam')
 
-# train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
-# train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-# history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# # history_plot(history)
+train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+ # history_plot(history)
 
 
 # In[ ]:
 
-# history_plot(history,'images/history_exp11.png','images/test_exp11.png')
+history_plot(history,'images/history_exp1.png','images/test_exp1.png')
 
 
 # ### Experiment2: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 15 (as feature); consecutive previous days
@@ -762,87 +764,91 @@ epochs = 200
 # history_plot_historyAsFeature(history,'images/history_exp21.png','images/test_exp21.png')
 
 
-# ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); Monday only for training, Monday for testing
-# 
+ ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); Monday only for training, Monday for testing
+ 
 
 # In[194]:
 
-# train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
-# # test_speed = train_speed[-1:]
-# # train_speed = train_speed[:-1]
+train_speed, _, _, _, _ = get_certain_dayofweek(Speed[:334],dayofweek = 0)
+ # test_speed = train_speed[-1:]
+ # train_speed = train_speed[:-1]
 
-# print('train_speed.shape = ',train_speed.shape)
-# # print('test_speed.shape = ',test_speed.shape)
-
-
-# In[ ]:
-
-# look_back = 15
-# look_back_days = 6
-# mode = 'uni'
-# train_speed_x1,train_speed_x2,train_speed_y = create_dataset_historyAsSecondInput(train_speed,train_speed, look_back, look_back_days, mode)
-
-# test_speed_x1 = train_speed_x1[-1:,:,:,:]
-# test_speed_x2 = train_speed_x2[-1:,:,:,:]
-# test_speed_y = train_speed_y[-1:,:,:]
-# train_speed_x1 = train_speed_x1[:-1,:,:,:]
-# train_speed_x2 = train_speed_x2[:-1,:,:,:]
-# train_speed_y = train_speed_y[:-1,:,:]
-
-# print('look_back = ',look_back)
-# print('look_back_days = ',look_back_days)
-# print('mode = ',mode)
-# print('train_speed_x1.shape = ',train_speed_x1.shape)
-# print('train_speed_x2.shape = ',train_speed_x2.shape)
-# print('train_speed_y.shape = ',train_speed_y.shape)
-# print('test_speed_x1.shape = ',test_speed_x1.shape)
-# print('test_speed_x2.shape = ',test_speed_x2.shape)
-# print('test_speed_y.shape = ',test_speed_y.shape)
+print('train_speed.shape = ',train_speed.shape)
+ # print('test_speed.shape = ',test_speed.shape)
 
 
 # In[ ]:
 
-# plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
+look_back = 15
+look_back_days = 6
+mode = 'uni'
+train_speed_x1,train_speed_x2,train_speed_y = create_dataset_historyAsSecondInput(train_speed,train_speed, look_back, look_back_days, mode)
+
+test_speed_x1 = train_speed_x1[-1:,:,:,:]
+test_speed_x2 = train_speed_x2[-1:,:,:,:]
+test_speed_y = train_speed_y[-1:,:,:]
+train_speed_x1 = train_speed_x1[:-1,:,:,:]
+train_speed_x2 = train_speed_x2[:-1,:,:,:]
+train_speed_y = train_speed_y[:-1,:,:]
+
+print('look_back = ',look_back)
+print('look_back_days = ',look_back_days)
+print('mode = ',mode)
+print('train_speed_x1.shape = ',train_speed_x1.shape)
+print('train_speed_x2.shape = ',train_speed_x2.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x1.shape = ',test_speed_x1.shape)
+print('test_speed_x2.shape = ',test_speed_x2.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
 
 
 # In[ ]:
 
-# batch_size = train_speed_x.shape[1]
-
-
-# todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-# h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-# h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(h1)
-
-# historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-# h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-# h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
-
-# h3 = keras.layers.concatenate([h1, h2])
-# predictedSpeed = Dense(1,name='predictedSpeed')(h3)
-
-# model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
-
-# model.compile(loss='mean_squared_error', optimizer='adam')
-
-# # model.compile(optimizer='rmsprop',
-# #               loss={'main_output': 'binary_crossentropy', 'aux_output': 'binary_crossentropy'},
-# #               loss_weights={'main_output': 1., 'aux_output': 0.2})
-
-# train_x1 = np.reshape(train_speed_x1,(train_speed_x1.shape[0]*train_speed_x1.shape[1],train_speed_x1.shape[2],train_speed_x1.shape[3]))
-# train_x2 = np.reshape(train_speed_x2,(train_speed_x2.shape[0]*train_speed_x2.shape[1],train_speed_x2.shape[2],train_speed_x2.shape[3]))
-# train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
-
-# history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
-#           {'predictedSpeed': train_y},
-#           epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-
-# # history_plot_historyAsSecondInput(history)
+plt.plot(test_speed_y[0,390:510,:])  #12-19-2016 Monday 6:30AM - 8:30AM
 
 
 # In[ ]:
 
-# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test_exp3.png')
+batch_size = train_speed_x.shape[1]
+
+
+todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+h1=BatchNormalization()(h1)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(h1)
+h1=BatchNormalization()(h1)
+
+historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=BatchNormalization()(h2)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
+h2=BatchNormalization()(h2)
+
+h3 = keras.layers.concatenate([h1, h2])
+predictedSpeed = Dense(1,name='predictedSpeed')(h3)
+
+model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
+
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+ # model.compile(optimizer='rmsprop',
+ #               loss={'main_output': 'binary_crossentropy', 'aux_output': 'binary_crossentropy'},
+ #               loss_weights={'main_output': 1., 'aux_output': 0.2})
+
+train_x1 = np.reshape(train_speed_x1,(train_speed_x1.shape[0]*train_speed_x1.shape[1],train_speed_x1.shape[2],train_speed_x1.shape[3]))
+train_x2 = np.reshape(train_speed_x2,(train_speed_x2.shape[0]*train_speed_x2.shape[1],train_speed_x2.shape[2],train_speed_x2.shape[3]))
+train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+
+history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
+           {'predictedSpeed': train_y},
+           epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+
+ # history_plot_historyAsSecondInput(history)
+
+
+# In[ ]:
+
+history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test_exp3.png')
 
 
 # ### Experiment3.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
@@ -1048,11 +1054,12 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(BatchNormalization())
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -1166,18 +1173,20 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-# h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+h1=BatchNormalization()(h1)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(h1)
 h1=BatchNormalization()(h1)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-# h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=BatchNormalization()(h2)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
 h2=BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
-h3 = Dropout(0.3)(h3)
+#h3 = Dropout(0.3)(h3)
 predictedSpeed = Dense(1,name='predictedSpeed')(h3)
 
 model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
@@ -1396,11 +1405,12 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(BatchNormalization())
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 # model.add(Flatten())
 model.add(Dense(train_speed_y.shape[2]))
 model.compile(loss='mean_squared_error', optimizer='adam')
@@ -1514,17 +1524,19 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-#h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(todaySequence)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+h1=BatchNormalization()(h1)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False)(h1)
 h1 = BatchNormalization()(h1)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-#h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=BatchNormalization()(h2)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False)(h2)
 h2 = BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2])
-h3 = Dropout(0.3)(h3)
+#h3 = Dropout(0.3)(h3)
 predictedSpeed = Dense(train_speed_y.shape[2],name='predictedSpeed')(h3)
 
 model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
@@ -1642,11 +1654,12 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 model = Sequential()
-# model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+model.add(BatchNormalization())
 # model.add(Dropout(0.3))
 model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
+#model.add(Dropout(0.3))
 model.add(Dense(train_speed_y.shape[2]))
 model.compile(loss='mean_squared_error', optimizer='adam')
 
@@ -1762,18 +1775,19 @@ print('test_speed_y.shape = ',test_speed_y.shape)
 batch_size = train_speed_x.shape[1]
 
 todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
-#h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
-
-h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+h1=BatchNormalization()(h1)
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(h1)
 h1 = BatchNormalization()(h1)
 
 historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
-#h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
-h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=BatchNormalization()(h2)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
 h2 = BatchNormalization()(h2)
 
 h3 = keras.layers.concatenate([h1, h2],name='h3')
-h3 = Dropout(0.3)(h3)
+#h3 = Dropout(0.3)(h3)
 # h3 = keras.layers.concatenate([h1, h2],name='h3')
 
 predictedSpeed = Dense(train_speed_y.shape[2],name='predictedSpeed')(h3)
