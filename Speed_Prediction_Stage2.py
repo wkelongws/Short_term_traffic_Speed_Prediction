@@ -28,7 +28,7 @@ import numpy as np
 import csv
 from sklearn.utils import shuffle
 from pylab import *
-# from matplotlib import gridspec
+from matplotlib import gridspec
 cdict = {'red': ((0.0, 1.0, 1.0),
                  (0.125, 1.0, 1.0),
                  (0.25, 1.0, 1.0),
@@ -43,7 +43,7 @@ cdict = {'red': ((0.0, 1.0, 1.0),
                   (1.0, 0.0, 0.0))}
 my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
 
-get_ipython().magic('matplotlib inline')
+#get_ipython().magic('matplotlib inline')
 
 #datapath = '/home/microway/Shuo/CarND/CarND-BehaviorCloning-Project/data-given/'
 
