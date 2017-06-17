@@ -43,7 +43,7 @@ cdict = {'red': ((0.0, 1.0, 1.0),
                   (1.0, 0.0, 0.0))}
 my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
 
-#get_ipython().magic('matplotlib inline')
+# %matplotlib inline
 
 #datapath = '/home/microway/Shuo/CarND/CarND-BehaviorCloning-Project/data-given/'
 
@@ -507,7 +507,7 @@ def history_plot_historyAsSecondInput(history_object,image1,image2,a=np.zeros((t
     fig1.savefig(image2, bbox_inches='tight')
 
 
-# In[114]:
+# In[362]:
 
 epochs = 1000
 
@@ -557,7 +557,8 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
 train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
 history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
-# history_plot(history)
+# model.load_weights('images/weights/exp1.hdf5', by_name=True)
+model.save_weights('images/weights/exp1.hdf5')
 
 
 # In[249]:
@@ -567,13 +568,13 @@ history = model.fit(train_x, train_y,epochs=epochs, batch_size=batch_size, verbo
 # history_plot(history,'images/history_exp1.png','images/test3_exp1.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
 
 
-# ### Experiment3.1: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
+# ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
 # 
 
 # In[262]:
 
 test_speed = Speed[data_test.index,:,:]
-# train_speed = Speed[data_train.index,:,:]
+
 train_speed0,_,_,_,_ = get_certain_dayofweek(Speed,0)
 train_speed1,_,_,_,_ = get_certain_dayofweek(Speed,1)
 train_speed2,_,_,_,_ = get_certain_dayofweek(Speed,2)
@@ -581,7 +582,7 @@ train_speed3,_,_,_,_ = get_certain_dayofweek(Speed,3)
 train_speed4,_,_,_,_ = get_certain_dayofweek(Speed,4)
 train_speed5,_,_,_,_ = get_certain_dayofweek(Speed,5)
 train_speed6,_,_,_,_ = get_certain_dayofweek(Speed,6)
-# train_speed0 = train_speed0[0:48,:,:]
+
 print('train_speed0.shape = ',train_speed0.shape)
 print('test_speed.shape = ',test_speed.shape)
 
@@ -691,17 +692,375 @@ history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
           {'predictedSpeed': train_y},
           epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
 
-# history_plot_historyAsSecondInput(history)
+# model.load_weights('images/weights/exp3.hdf5', by_name=True)
+model.save_weights('images/weights/exp3.hdf5')
 
 
-# In[322]:
+# In[323]:
 
-history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test1_exp3.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
-history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test2_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
-history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test3_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test1_exp3.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test2_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test3_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
 
+
+# ### Experiment4: input: univariate speed; output: univariate delta speed; lookback = 15
+
+# In[354]:
+
+train_speed0,train_speed_y0,_,mean0,_ = get_certain_dayofweek(Speed,0,data_train)
+train_speed1,train_speed_y1,_,_,_ = get_certain_dayofweek(Speed,1,data_train)
+train_speed2,train_speed_y2,_,_,_ = get_certain_dayofweek(Speed,2,data_train)
+train_speed3,train_speed_y3,_,_,_ = get_certain_dayofweek(Speed,3,data_train)
+train_speed4,train_speed_y4,_,mean4,_ = get_certain_dayofweek(Speed,4,data_train)
+train_speed5,train_speed_y5,_,_,_ = get_certain_dayofweek(Speed,5,data_train)
+train_speed6,train_speed_y6,_,_,_ = get_certain_dayofweek(Speed,6,data_train)
+
+test_speed = Speed[data_test.index,:,:]
+test_speed_y0 = np.concatenate((test_speed[0:1]-mean4,test_speed[1:2]-mean0,test_speed[2:3]-mean4),axis=0)
+
+print('train_speed0.shape = ',train_speed0.shape)
+print('test_speed.shape = ',test_speed.shape)
+# data_test
+
+
+# In[355]:
+
+look_back = 15
+mode = 'uni'
+
+test_speed_x,test_speed_y = create_dataset(test_speed,test_speed_y0, look_back, mode)
+
+train_speed_x,train_speed_y = create_dataset(train_speed0,train_speed_y0, look_back, mode)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed1,train_speed_y1, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed2,train_speed_y2, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed3,train_speed_y3, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed4,train_speed_y4, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed5,train_speed_y5, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_y0 = create_dataset(train_speed6,train_speed_y6, look_back,mode)
+train_speed_x = np.concatenate((train_speed_x,train_speed_x10),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+
+print('look_back = ',look_back)
+print('look_back_days = ',look_back_days)
+print('mode = ',mode)
+print('train_speed_x.shape = ',train_speed_x.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x.shape = ',test_speed_x.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
+
+mean0=mean0[look_back:,:]
+mean4=mean4[look_back:,:]
+
+
+# In[361]:
+
+# plt.plot(test_speed_y[0,:,:]+mean0[:,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
+
+
+# In[367]:
+
+batch_size = train_speed_x.shape[1]
+
+model = Sequential()
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False, return_sequences=True))
+# model.add(Dropout(0.3))
+model.add(LSTM(32, input_shape=(look_back, train_speed_x.shape[3]), stateful=False))
+# model.add(Dropout(0.3))
+model.add(Dense(1))
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+train_x = np.reshape(train_speed_x,(train_speed_x.shape[0]*train_speed_x.shape[1],train_speed_x.shape[2],train_speed_x.shape[3]))
+train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+# model.load_weights('images/weights/exp4.hdf5', by_name=True)
+model.save_weights('images/weights/exp4.hdf5')
+
+
+# In[365]:
+
+# history_plot(history,'images/history_exp4.png','images/test1_exp4.png',a=mean4,b=mean4,scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+# history_plot(history,'images/history_exp4_delta.png','images/test1_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=1)
+
+# history_plot(history,'images/history_exp4.png','images/test2_exp4.png',a=mean0,b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+# history_plot(history,'images/history_exp4_delta.png','images/test2_exp4_delta.png',b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+
+# history_plot(history,'images/history_exp4.png','images/test3_exp4.png',a=mean4,b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+# history_plot(history,'images/history_exp4_delta.png','images/test3_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+
+
+# ### Experiment6: input: univariate speed; output: univariate delta speed; lookback = 15; lookback weeks = 6 (parallel structure)
+
+# In[378]:
+
+train_speed0,train_speed_y0,_,mean0,_ = get_certain_dayofweek(Speed,0)
+train_speed1,train_speed_y1,_,_,_ = get_certain_dayofweek(Speed,1)
+train_speed2,train_speed_y2,_,_,_ = get_certain_dayofweek(Speed,2)
+train_speed3,train_speed_y3,_,_,_ = get_certain_dayofweek(Speed,3)
+train_speed4,train_speed_y4,_,mean4,_ = get_certain_dayofweek(Speed,4)
+train_speed5,train_speed_y5,_,_,_ = get_certain_dayofweek(Speed,5)
+train_speed6,train_speed_y6,_,_,_ = get_certain_dayofweek(Speed,6)
+
+test_speed = Speed[data_test.index,:,:]
+test_speed_y0 = np.concatenate((test_speed[0:1]-mean4,test_speed[1:2]-mean0,test_speed[2:3]-mean4),axis=0)
+
+print('train_speed0.shape = ',train_speed0.shape)
+print('test_speed.shape = ',test_speed.shape)
+
+
+# In[379]:
+
+index1=list(data.index[data['dayofweek'] == 4]).index(data_test.index[data_test['dayofweek'] == 4][0])
+index2=list(data.index[data['dayofweek'] == 0]).index(data_test.index[data_test['dayofweek'] == 0][0])
+index3=list(data.index[data['dayofweek'] == 4]).index(data_test.index[data_test['dayofweek'] == 4][1])
+print('index1={}  index2={}  index3={} '.format(index1,index2,index3))
+
+
+# In[380]:
+
+look_back = 15
+look_back_days = 6
+mode = 'uni'
+train_speed_x1,train_speed_x2,train_speed_y = create_dataset_historyAsSecondInput(train_speed0,train_speed_y0, look_back, look_back_days, mode)
+test_speed_x1_2 = train_speed_x1[index2-look_back_days:index1-look_back_days+1,:,:,:]
+test_speed_x2_2 = train_speed_x2[index2-look_back_days:index1-look_back_days+1,:,:,:]
+test_speed_y_2 = train_speed_y[index2-look_back_days:index1-look_back_days+1,:,:]
+train_speed_x1 = train_speed_x1[list(range(index2-look_back_days))+list(range(index2-look_back_days+1,len(train_speed_x1))),:,:,:]
+train_speed_x2 = train_speed_x2[list(range(index2-look_back_days))+list(range(index2-look_back_days+1,len(train_speed_x2))),:,:,:]
+train_speed_y = train_speed_y[list(range(index2-look_back_days))+list(range(index2-look_back_days+1,len(train_speed_y))),:,:]
+
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed1,train_speed_y1, look_back, look_back_days, mode)
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed2,train_speed_y2, look_back, look_back_days, mode)
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed3,train_speed_y3, look_back, look_back_days, mode)
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed4,train_speed_y4, look_back, look_back_days, mode)
+test_speed_x1_13 = train_speed_x10[[index1-look_back_days,index3-look_back_days],:,:,:]
+test_speed_x2_13 = train_speed_x20[[index1-look_back_days,index3-look_back_days],:,:,:]
+test_speed_y_13 = train_speed_y0[[index1-look_back_days,index3-look_back_days],:,:]
+train_speed_x10 = train_speed_x10[list(range(index1-look_back_days))+list(range(index1-look_back_days+1,index3-look_back_days))+list(range(index3-look_back_days+1,len(train_speed_x10))),:,:,:]
+train_speed_x20 = train_speed_x20[list(range(index1-look_back_days))+list(range(index1-look_back_days+1,index3-look_back_days))+list(range(index3-look_back_days+1,len(train_speed_x20))),:,:,:]
+train_speed_y0 = train_speed_y0[list(range(index1-look_back_days))+list(range(index1-look_back_days+1,index3-look_back_days))+list(range(index3-look_back_days+1,len(train_speed_y0))),:,:]
+
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed5,train_speed_y5, look_back, look_back_days, mode)
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+train_speed_x10,train_speed_x20,train_speed_y0 = create_dataset_historyAsSecondInput(train_speed6,train_speed_y6, look_back, look_back_days, mode)
+train_speed_x1 = np.concatenate((train_speed_x1,train_speed_x10),axis=0)
+train_speed_x2 = np.concatenate((train_speed_x2,train_speed_x20),axis=0)
+train_speed_y = np.concatenate((train_speed_y,train_speed_y0),axis=0)
+
+test_speed_x1 = np.concatenate((test_speed_x1_13[0:1],test_speed_x1_2,test_speed_x1_13[-1:]),axis=0)
+test_speed_x2 = np.concatenate((test_speed_x2_13[0:1],test_speed_x2_2,test_speed_x2_13[-1:]),axis=0)                                                                          
+test_speed_y = np.concatenate((test_speed_y_13[0:1],test_speed_y_2,test_speed_y_13[-1:]),axis=0)  
+                                                                        
+print('look_back = ',look_back)
+print('look_back_days = ',look_back_days)
+print('mode = ',mode)
+print('train_speed_x1.shape = ',train_speed_x1.shape)
+print('train_speed_x2.shape = ',train_speed_x2.shape)
+print('train_speed_y.shape = ',train_speed_y.shape)
+print('test_speed_x1.shape = ',test_speed_x1.shape)
+print('test_speed_x2.shape = ',test_speed_x2.shape)
+print('test_speed_y.shape = ',test_speed_y.shape)
+
+mean0=mean0[look_back:,:]
+mean4=mean4[look_back:,:]
+
+
+# In[386]:
+
+# plt.plot(test_speed_y[0,:,:]+mean4[:,0:1])  #12-19-2016 Monday 6:30AM - 8:30AM
+
+
+# In[387]:
+
+
+batch_size = train_speed_x.shape[1]
+
+todaySequence = Input(shape=(look_back, train_speed_x1.shape[3]),name='todaySequence')
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False, return_sequences=True)(todaySequence)
+
+h1=LSTM(32, input_shape=(look_back, train_speed_x1.shape[3]), stateful=False,name='h1')(todaySequence)
+h1= BatchNormalization()(h1)
+
+historySequence = Input(shape=(look_back_days, train_speed_x2.shape[3]),name='historySequence')
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False, return_sequences=True)(historySequence)
+h2=LSTM(32, input_shape=(look_back, train_speed_x2.shape[3]), stateful=False,name='h2')(h2)
+
+h3 = keras.layers.concatenate([h1, h2],name='h3')
+# h3 = keras.layers.concatenate([h1, h2],name='h3')
+
+predictedSpeed = Dense(1,name='predictedSpeed')(h3)
+
+model = Model(inputs=[todaySequence, historySequence], outputs=[predictedSpeed])
+
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+# model.compile(optimizer='rmsprop',
+#               loss={'main_output': 'binary_crossentropy', 'aux_output': 'binary_crossentropy'},
+#               loss_weights={'main_output': 1., 'aux_output': 0.2})
+
+train_x1 = np.reshape(train_speed_x1,(train_speed_x1.shape[0]*train_speed_x1.shape[1],train_speed_x1.shape[2],train_speed_x1.shape[3]))
+train_x2 = np.reshape(train_speed_x2,(train_speed_x2.shape[0]*train_speed_x2.shape[1],train_speed_x2.shape[2],train_speed_x2.shape[3]))
+train_y = np.reshape(train_speed_y,(train_speed_y.shape[0]*train_speed_y.shape[1],train_speed_y.shape[2]))
+
+history = model.fit({'todaySequence': train_x1, 'historySequence': train_x2},
+          {'predictedSpeed': train_y},
+          epochs=epochs, batch_size=batch_size, verbose=1, shuffle=True)
+
+# model.load_weights('images/weights/exp6.hdf5', by_name=True)
+model.save_weights('images/weights/exp6.hdf5')
+
+
+# In[389]:
+
+# history_plot_historyAsSecondInput(history,'images/history_exp6.png','images/test_exp6.png',a=mean0,b=mean0)
+# history_plot_historyAsSecondInput(history,'images/history_exp6_delta.png','images/test_exp6_delta.png',b=mean0)
+
+history_plot_historyAsSecondInput(history,'images/history_exp6.png','images/test1_exp6.png',a=mean4,b=mean4,scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+history_plot_historyAsSecondInput(history,'images/history_exp6_delta.png','images/test1_exp6_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=1)
+
+history_plot_historyAsSecondInput(history,'images/history_exp6.png','images/test2_exp6.png',a=mean0,b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+history_plot_historyAsSecondInput(history,'images/history_exp6_delta.png','images/test2_exp6_delta.png',b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+
+history_plot_historyAsSecondInput(history,'images/history_exp6.png','images/test3_exp6.png',a=mean4,b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+history_plot_historyAsSecondInput(history,'images/history_exp6_delta.png','images/test3_exp6_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+
+
+# ### plotting functions for multi-variate cases
 
 # In[ ]:
 
+# # plotting functions for multi-variate cases
 
+# def history_plot_multi(history_object,image1='image1',image2='image2',image3='image3',a=np.zeros((test_speed_y.shape[1],1)),b=np.zeros((test_speed_y.shape[1],1)),scoreflag=True,look_ahead = 120,start = 390,test_case=1):
+    
+#     if scoreflag:
+#         model_score(history_object,image1)
+    
+#     look_ahead = 120
+#     start = 390
+#     trainPredict = test_speed_x[0,start,:,:]
+#     predictions = np.zeros((look_ahead,15))
+
+#     for i in range(look_ahead):
+#         prediction = model.predict(np.array([trainPredict]), batch_size=batch_size)
+#         predictions[i] = prediction
+#         trainPredict = np.vstack([trainPredict[1:],prediction+b[(start+i):(start+i+1),:1]])
+
+#     fig1 = plt.figure(figsize=(12,10))
+#     ax1 = plt.subplot(2,1,1)
+#     ax1.set_title('prediction at the start of day', fontsize=20)
+    
+#     plt.plot(np.arange(look_ahead),predictions[:,:1]+a[start:(start+look_ahead),:1],'r',label="prediction")
+#     plt.plot(np.arange(look_ahead),test_speed_y[0,start:(start+look_ahead),:1]+a[start:(start+look_ahead),:1],label="test function")
+#     plt.legend()
+
+#     predictions_1 = np.zeros((look_ahead,15))
+
+#     for i in range(look_ahead):
+#         trainPredict = test_speed_x[0,start+i,:,:]
+#         prediction = model.predict(np.array([trainPredict]), batch_size=batch_size)
+#         predictions_1[i] = prediction
+
+
+#     ax2 = plt.subplot(2,1,2)
+#     ax2.set_title('prediction using real-time data', fontsize=20)
+#     plt.plot(np.arange(look_ahead),predictions_1[:,:1]+a[start:(start+look_ahead),:1],'r',label="prediction")
+#     plt.plot(np.arange(look_ahead),test_speed_y[0,start:(start+look_ahead),:1]+a[start:(start+look_ahead),:1],label="test function")
+#     plt.legend()
+
+#     fig1.savefig(image2, bbox_inches='tight')
+
+#     fig3 = plt.figure(figsize=(12,10))
+#     ax1 = plt.subplot(3,1,1)
+#     ax1.set_title('test data', fontsize=20)
+#     plt.pcolor(test_speed_y[0,start:(start+look_ahead),:].transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     ax2 = plt.subplot(3,1,2)
+#     ax2.set_title('prediction at the start', fontsize=20)
+#     plt.pcolor(predictions.transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     ax3 = plt.subplot(3,1,3)
+#     ax3.set_title('prediction using real-time data', fontsize=20)
+#     plt.pcolor(predictions_1.transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     fig3.savefig(image3, bbox_inches='tight')
+
+# def history_plot_multi_historyAsSecondInput(history_object,image1='image1',image2='image2',image3='image3',a=np.zeros((test_speed_y.shape[1],1)),b=np.zeros((test_speed_y.shape[1],1)),scoreflag=True,look_ahead = 120,start = 390,test_case=1):
+  
+#     if scoreflag:
+#         model_score2(history_object,image1)
+    
+#     look_ahead = 120
+#     start = 390
+#     trainPredict = test_speed_x1[0,start,:,:]  
+#     predictions = np.zeros((look_ahead,15))
+
+#     for i in range(look_ahead):
+#         input2 = test_speed_x2[0,start+i,:,:]
+#         prediction = model.predict([np.array([trainPredict]),np.array([input2])], batch_size=batch_size)
+#         predictions[i] = prediction
+#         trainPredict = np.vstack([trainPredict[1:],prediction+b[(start+i):(start+i+1),:1]])
+
+#     fig1 = plt.figure(figsize=(12,10))
+#     ax1 = plt.subplot(2,1,1)
+#     ax1.set_title('prediction at the start of day', fontsize=20)
+#     plt.plot(np.arange(look_ahead),predictions[:,:1]+a[start:(start+look_ahead),:1],'r',label="prediction")
+#     plt.plot(np.arange(look_ahead),test_speed_y[0,start:(start+look_ahead),:1]+a[start:(start+look_ahead),:1],label="test function")
+#     plt.legend()
+
+#     predictions_1 = np.zeros((look_ahead,15))
+
+#     for i in range(look_ahead):
+#         trainPredict = test_speed_x1[0,start+i,:,:]
+#         input2 = test_speed_x2[0,start+i,:,:]
+#         prediction = model.predict([np.array([trainPredict]),np.array([input2])], batch_size=batch_size)
+#         predictions_1[i] = prediction
+
+
+#     ax2 = plt.subplot(2,1,2)
+#     ax2.set_title('prediction using real-time data', fontsize=20)
+#     plt.plot(np.arange(look_ahead),predictions_1[:,:1]+a[start:(start+look_ahead),:1],'r',label="prediction")
+#     plt.plot(np.arange(look_ahead),test_speed_y[0,start:(start+look_ahead),:1]+a[start:(start+look_ahead),:1],label="test function")
+#     plt.legend()
+
+#     fig1.savefig(image2, bbox_inches='tight')
+
+#     fig3 = plt.figure(figsize=(12,10))
+#     ax1 = plt.subplot(3,1,1)
+#     ax1.set_title('test data', fontsize=20)
+#     plt.pcolor(test_speed_y[0,start:(start+look_ahead),:].transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     ax2 = plt.subplot(3,1,2)
+#     ax2.set_title('prediction at the start', fontsize=20)
+#     plt.pcolor(predictions.transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     ax3 = plt.subplot(3,1,3)
+#     ax3.set_title('prediction using real-time data', fontsize=20)
+#     plt.pcolor(predictions_1.transpose()+a[start:(start+look_ahead),:].transpose(),cmap=my_cmap, vmin=20, vmax=70)
+    
+#     fig3.savefig(image3, bbox_inches='tight')
 
