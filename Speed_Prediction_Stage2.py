@@ -509,7 +509,7 @@ def history_plot_historyAsSecondInput(history_object,image1,image2,a=np.zeros((t
 
 # In[362]:
 
-epochs = 1000
+epochs = 2000
 
 
 # ### Experiment1: input: univariate speed; output: univariate speed; lookback = 15; all year
@@ -563,9 +563,9 @@ model.save_weights('images/weights/exp1.hdf5')
 
 # In[249]:
 
-# history_plot(history,'images/history_exp1.png','images/test1_exp1.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
-# history_plot(history,'images/history_exp1.png','images/test2_exp1.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
-# history_plot(history,'images/history_exp1.png','images/test3_exp1.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+history_plot(history,'images/history_exp1.png','images/test1_exp1.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+history_plot(history,'images/history_exp1.png','images/test2_exp1.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+history_plot(history,'images/history_exp1.png','images/test3_exp1.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
 
 
 # ### Experiment3: input: univariate speed; output: univariate speed; lookback = 15; lookback weeks = 6 (parallel structure); all weekdays for training, monday for testing
@@ -698,9 +698,9 @@ model.save_weights('images/weights/exp3.hdf5')
 
 # In[323]:
 
-# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test1_exp3.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
-# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test2_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
-# history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test3_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test1_exp3.png',scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test2_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+history_plot_historyAsSecondInput(history,'images/history_exp3.png','images/test3_exp3.png',scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
 
 
 # ### Experiment4: input: univariate speed; output: univariate delta speed; lookback = 15
@@ -788,14 +788,14 @@ model.save_weights('images/weights/exp4.hdf5')
 
 # In[365]:
 
-# history_plot(history,'images/history_exp4.png','images/test1_exp4.png',a=mean4,b=mean4,scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
-# history_plot(history,'images/history_exp4_delta.png','images/test1_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=1)
+history_plot(history,'images/history_exp4.png','images/test1_exp4.png',a=mean4,b=mean4,scoreflag=True,look_ahead = 1400,start = 0,test_case=1)
+history_plot(history,'images/history_exp4_delta.png','images/test1_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=1)
 
-# history_plot(history,'images/history_exp4.png','images/test2_exp4.png',a=mean0,b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
-# history_plot(history,'images/history_exp4_delta.png','images/test2_exp4_delta.png',b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+history_plot(history,'images/history_exp4.png','images/test2_exp4.png',a=mean0,b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
+history_plot(history,'images/history_exp4_delta.png','images/test2_exp4_delta.png',b=mean0,scoreflag=False,look_ahead = 1400,start = 0,test_case=2)
 
-# history_plot(history,'images/history_exp4.png','images/test3_exp4.png',a=mean4,b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
-# history_plot(history,'images/history_exp4_delta.png','images/test3_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+history_plot(history,'images/history_exp4.png','images/test3_exp4.png',a=mean4,b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
+history_plot(history,'images/history_exp4_delta.png','images/test3_exp4_delta.png',b=mean4,scoreflag=False,look_ahead = 1400,start = 0,test_case=3)
 
 
 # ### Experiment6: input: univariate speed; output: univariate delta speed; lookback = 15; lookback weeks = 6 (parallel structure)
